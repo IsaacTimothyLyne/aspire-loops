@@ -1,0 +1,15 @@
+<div class="wrap">
+  <div class="card">
+    <div class="cover"></div>
+    <div class="fields">
+      <label>Pack title</label>
+      <input [(ngModel)]="title" placeholder="e.g., Electric Hues" />
+      <div class="row">
+        <button class="btn ghost" routerLink="/make">Cancel</button>
+        <button class="btn" (click)="create()">Create Pack</button>
+      </div>
+    </div>
+  </div>
+  <p class="hint">Tip: you can change artwork, BPM & key on the next screen.</p>
+</div>
+TEST

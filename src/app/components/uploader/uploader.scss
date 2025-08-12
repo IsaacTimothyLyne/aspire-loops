@@ -1,0 +1,11 @@
+.drop{display:flex;align-items:center;justify-content:center;text-align:center;
+  gap:8px;height:140px;border:1px dashed #2a384b;border-radius:14px;background:#0e131a;
+  color:#9fb0c0; cursor:pointer; position:relative; }
+.drop input[type="file"]{position:absolute; inset:0; opacity:0; cursor:pointer}
+.rows{margin-top:12px;display:grid;gap:8px}
+.row{display:grid;grid-template-columns:1fr 1fr 48px;gap:10px;align-items:center;
+  background:#0f141b;border:1px solid #1c2735;border-radius:10px;padding:8px 10px}
+.name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar{height:6px;background:#0b1118;border-radius:6px;overflow:hidden}
+.fill{height:6px;background:#2dd4bf}
+.pct{font-variant-numeric: tabular-nums}

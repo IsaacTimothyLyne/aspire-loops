@@ -1,0 +1,91 @@
+.wrap {
+  padding: 24px;
+  color: #e8ecf1;
+}
+
+.head {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.cover {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  background: radial-gradient(130% 130% at 0 0, #6ee7b7 0, #22d3ee 30%, #6366f1 120%);
+}
+
+.meta h1 {
+  margin: 0 0 6px;
+}
+
+.chips {
+  color: #9fb0c0;
+  font-size: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn {
+  background: #131922;
+  border: 1px solid #263241;
+  border-radius: 12px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+}
+
+.btn.ghost {
+  background: transparent;
+}
+
+.section {
+  margin: 18px 0 10px;
+  color: #bcd;
+}
+
+.items {
+  display: grid;
+  gap: 8px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  background: #121821;
+  border: 1px solid #1e2a38;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  background: #2dd4bf;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.meta {
+  color: #9fb0c0;
+  font-size: 12px;
+}
+
+.empty {
+  opacity: 0.7;
+  padding: 24px;
+  border: 1px dashed #2a384b;
+  border-radius: 12px;
+  background: #0e131a;
+}
+
+/*# sourceMappingURL=pack.css.map */

@@ -1,1 +1,29 @@
-<p>pack works!</p>
+<div class="wrap" *ngIf="packId() as id">
+  <header class="head">
+    <div class="cover"></div>
+    <div class="meta">
+      <h1>{{title()}}</h1>
+      <div class="chips">Private · created {{createdAt() | date:'mediumDate'}}</div>
+      <div class="actions">
+        <button class="btn" (click)="refresh()">Refresh</button>
+        <button class="btn ghost" routerLink="/make">Back</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="uploader">
+    <app-uploader [packId]="id" (uploaded)="onUploaded()"></app-uploader>
+  </section>
+
+  <h3 class="section">Items</h3>
+  <div class="items" *ngIf="items().length; else empty">
+    <div class="item" *ngFor="let it of items()">
+      <div class="dot"></div>
+      <div class="name">{{it.name}}</div>
+      <div class="meta">{{it.format?.toUpperCase()}} · {{it.bpm || '—'}} BPM · {{it.key || '—'}}</div>
+    </div>
+  </div>
+  <ng-template #empty>
+    <div class="empty">Drop WAV/AIFF/MP3 files above to start this pack.</div>
+  </ng-template>
+</div>

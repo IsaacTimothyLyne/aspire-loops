@@ -1,0 +1,3 @@
+<input placeholder="Pack ID" [(ngModel)]="packId">
+<button (click)="make()">Create Share Link</button>
+<div *ngIf="url()">Share URL: {{ url() }}</div>
