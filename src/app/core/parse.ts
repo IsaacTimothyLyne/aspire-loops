@@ -25,3 +25,21 @@ export function parseFilename(fileName: string): ParsedMeta {
   if (!clean) clean = name;
   return { cleanName: clean, bpm, key };
 }
+
+export function assistParse(filename: string) {
+  const base = filename.replace(/\.[^.]+$/, '');
+  const out: any = {};
+  const bpmMatch = base.match(/(?:(\d{2,3})\s*bpm)|(\b\d{2,3}\b)/i);
+  const keyMatch = base.match(/\b([A-G](?:#|b)?m?(?:aj|maj|min)?)\b/i);
+  if (bpmMatch) out.bpm = Number(bpmMatch[1] || bpmMatch[2]);
+  if (keyMatch) out.key = keyMatch[1].replace(/aj|maj/i,'M').replace(/min/i,'m');
+  let name = base
+    .replace(/\b\d{2,3}\s*bpm\b/i,'')
+    .replace(/\b\d{2,3}\b/,'')
+    .replace(/\b([A-G](?:#|b)?m?(?:aj|maj|min)?)\b/i,'')
+    .replace(/[\-_]+/g,' ')
+    .replace(/\s{2,}/g,' ')
+    .trim();
+  out.name = name || base;
+  return out;
+}

@@ -2,9 +2,9 @@ import { Injectable, inject } from '@angular/core';
 import {
   Firestore,
   collection, doc, setDoc, addDoc, getDoc, getDocs, updateDoc,
-  query, where, orderBy, limit, collectionData
+  query, where, orderBy as ob, limit, collectionData, QueryConstraint
 } from '@angular/fire/firestore';
-import { Storage, ref, getDownloadURL } from '@angular/fire/storage';
+import {Storage, ref, getDownloadURL, getBlob, getBytes, getMetadata} from '@angular/fire/storage';
 import {catchError, firstValueFrom, map, Observable} from 'rxjs';
 import {Pack} from './models';
 
@@ -26,9 +26,21 @@ export class Db {
     const snap = await getDoc(doc(this.fs, 'packs', id));
     return snap.exists() ? (snap.data() as any) : null;
   }
+  // Db.blobFor – super quiet version
+  async blobFor(storagePath: string) {
+    const r = ref(this.storage, storagePath);
+    const [meta, bytes] = await Promise.all([getMetadata(r).catch(() => null), getBytes(r)]);
+    return new Blob([bytes], { type: meta?.contentType || 'audio/wav' });
+  }
+
+
 
   async updatePack(id: string, patch: any) {
     await updateDoc(doc(this.fs, 'packs', id), { ...patch, updatedAt: Date.now() });
+  }
+  async updateItemTouch(packId: string, itemId: string, patch: any) {
+    await updateDoc(doc(this.fs, `packs/${packId}/items/${itemId}`), patch);
+    await this.updatePack(packId, {}); // bumps updatedAt in your existing method
   }
   /** One-shot fetch for convenience (used by Upload page) */
   async myPacks(uid: string, take = 50): Promise<any[]> {
@@ -41,7 +53,7 @@ export class Db {
     const ordered = query(
       packs as any,
       where('ownerUid', '==', uid),
-      orderBy('updatedAt', 'desc'),
+      ob('updatedAt', 'desc'),
       limit(take)
     );
 
@@ -85,5 +97,21 @@ export class Db {
     };
     const refDoc = await addDoc(shares as any, data as any);
     return refDoc.id;
+  }
+  itemsStream(packId: string, take = 500) {
+    const col = this.itemsCol(packId);
+    const q = query(col as any, ob('createdAt', 'asc') as unknown as QueryConstraint, limit(take));
+    return collectionData(q, { idField: 'id' } as any) as Observable<any[]>;
+  }
+
+  async recomputePackStats(packId: string) {
+    const items = await this.listItems(packId);
+    const bpms = items.map((i: any) => i.bpm).filter((x: any) => typeof x === 'number');
+    const keys = Array.from(new Set(items.map((i: any) => i.key).filter(Boolean)));
+    const patch: any = { updatedAt: Date.now() };
+    if (bpms.length) { patch.bpmMin = Math.min(...bpms); patch.bpmMax = Math.max(...bpms); }
+    else { patch.bpmMin = null; patch.bpmMax = null; }
+    patch.keys = keys;
+    await updateDoc(doc(this.fs, 'packs', packId), patch);
   }
 }

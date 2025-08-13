@@ -2,10 +2,12 @@
   <header class="head">
     <div class="cover"></div>
     <div class="meta">
-      <h1>{{title()}}</h1>
+      <h1 contenteditable
+          (blur)="db.updatePack(id,{title:$any($event.target).innerText.trim()}); refreshPackHeader()">
+        {{title()}}
+      </h1>
       <div class="chips">Private · created {{createdAt() | date:'mediumDate'}}</div>
       <div class="actions">
-        <button class="btn" (click)="refresh()">Refresh</button>
         <button class="btn ghost" routerLink="/make">Back</button>
       </div>
     </div>
@@ -15,15 +17,56 @@
     <app-uploader [packId]="id" (uploaded)="onUploaded()"></app-uploader>
   </section>
 
-  <h3 class="section">Items</h3>
-  <div class="items" *ngIf="items().length; else empty">
-    <div class="item" *ngFor="let it of items()">
-      <div class="dot"></div>
-      <div class="name">{{it.name}}</div>
-      <div class="meta">{{it.format?.toUpperCase()}} · {{it.bpm || '—'}} BPM · {{it.key || '—'}}</div>
+  <section class="panel">
+    <div class="left">
+      <h3>Items</h3>
+      <div class="table" *ngIf="items().length; else empty">
+        <div class="row head">
+          <div class="c play"></div>
+          <div class="c name">Name</div>
+          <div class="c bpm">BPM</div>
+          <div class="c key">Key</div>
+          <div class="c tags">Tags</div>
+          <div class="c meta">Format</div>
+        </div>
+        <div class="row"
+             *ngFor="let it of items()"
+             [class.sel]="it.id===selectedId()"
+             (click)="select(it)">
+          <div class="c play"><button class="icon">▶</button></div>
+          <div class="c name">
+            <input [value]="it.name || ''"
+                   (blur)="saveField(it,'name',$any($event.target).value)"
+                   (keyup.enter)="($event.target)" />
+          </div>
+          <div class="c bpm">
+            <input type="number" [value]="it.bpm || ''"
+                   (blur)="saveField(it,'bpm',$any($event.target).value)"
+                   (keyup.enter)="($event.target)" />
+          </div>
+          <div class="c key">
+            <input [value]="it.key || ''"
+                   (blur)="saveField(it,'key',$any($event.target).value)"
+                   (keyup.enter)="($event.target)" />
+          </div>
+          <div class="c tags">
+            <input [value]="(it.tags||[]).join(', ')"
+                   (blur)="saveField(it,'tags',$any($event.target).value)"
+                   (keyup.enter)="($event.target)" />
+          </div>
+          <div class="c meta">{{it.format?.toUpperCase() || '—'}}</div>
+        </div>
+      </div>
+      <ng-template #empty>
+        <div class="empty">Drop WAV/AIFF/MP3 files above to start this pack.</div>
+      </ng-template>
     </div>
-  </div>
-  <ng-template #empty>
-    <div class="empty">Drop WAV/AIFF/MP3 files above to start this pack.</div>
-  </ng-template>
+
+    <div class="right">
+      <div class="wavewrap">
+        <div #wave class="wave"></div>
+        <div class="hint">Space = play/pause · ↑/↓ = move</div>
+      </div>
+    </div>
+  </section>
 </div>
