@@ -1,0 +1,52 @@
+<div class="wrap">
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    <h1 class="brand">Aspire<span>Loops</span></h1>
+    <h2 class="title">{{ mode() === 'login' ? 'Sign in' : 'Create account' }}</h2>
+
+    <label>Email</label>
+    <input formControlName="email" type="email" autocomplete="email" placeholder="you@studio.com" />
+
+    <label>Password</label>
+    <div class="pw">
+      <input
+        formControlName="password"
+        [type]="showPw() ? 'text' : 'password'"
+        autocomplete="current-password"
+        placeholder="••••••••"
+      />
+      <button class="link" type="button" (click)="toggleShow()">
+        {{ showPw() ? 'Hide' : 'Show' }}
+      </button>
+    </div>
+
+    <div class="hint" *ngIf="mode() === 'signup'">
+      <div class="row">
+        <label>Confirm password</label>
+        <input formControlName="confirm" [type]="showPw() ? 'text' : 'password'" placeholder="••••••••" />
+      </div>
+      <div class="muted">Use 8+ chars; mix letters & numbers for strength.</div>
+    </div>
+
+    <div class="row space">
+      <label class="check">
+        <input type="checkbox" [checked]="remember()" (change)="remember.set($any($event.target).checked)" />
+        Remember me
+      </label>
+
+      <button type="button" class="link" (click)="reset()" *ngIf="mode() === 'login'">Forgot password?</button>
+    </div>
+
+    <div class="msg err" *ngIf="err()">{{ err() }}</div>
+    <div class="msg info" *ngIf="info()">{{ info() }}</div>
+
+    <button class="submit" type="submit" [disabled]="loading()">
+      {{ loading() ? 'Please wait…' : (mode() === 'login' ? 'Sign in' : 'Create account') }}
+    </button>
+
+    <div class="swap">
+      <button type="button" class="link" (click)="toggleMode()">
+        {{ mode() === 'login' ? 'Create an account' : 'Have an account? Sign in' }}
+      </button>
+    </div>
+  </form>
+</div>

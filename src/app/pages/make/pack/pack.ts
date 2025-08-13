@@ -4,12 +4,12 @@ import { Auth } from '@angular/fire/auth';
 import { Db} from '../../../core/db';
 import { UploaderComponent} from '../../../components/uploader/uploader';
 import {FormsModule} from '@angular/forms';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-pack',
-  imports: [CommonModule, UploaderComponent, FormsModule],
+  imports: [CommonModule, UploaderComponent, FormsModule, RouterLink],
   templateUrl: './pack.html'
 })
 export class Pack {

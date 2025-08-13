@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
-import { Auth, onAuthStateChanged, User } from '@angular/fire/auth';
+import { Auth, onAuthStateChanged, User, reload } from '@angular/fire/auth';
 
 function waitForUser(auth: Auth): Promise<User | null> {
   return new Promise((resolve) => {
@@ -8,9 +8,15 @@ function waitForUser(auth: Auth): Promise<User | null> {
   });
 }
 
-export const authGuard: CanActivateFn = async (): Promise<boolean | UrlTree> => {
+export const verifiedGuard: CanActivateFn = async (): Promise<boolean | UrlTree> => {
   const auth = inject(Auth);
   const router = inject(Router);
+
   const user = await waitForUser(auth);
-  return user ? true : router.parseUrl('/auth');
+  if (!user) return router.parseUrl('/auth');
+
+  // optional: refresh once to pick up a just-verified state
+  try { await reload(user); } catch {}
+
+  return user.emailVerified ? true : router.parseUrl('/verify');
 };

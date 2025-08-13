@@ -1,0 +1,162 @@
+@charset "UTF-8";
+:root {
+  --bg:#0f1216;
+  --card:#151a20;
+  --text:#e8ecf1;
+  --muted:#9fb0c0;
+  --accent:#2dd4bf;
+  --danger:#ff7a7a;
+}
+
+.wrap {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.card {
+  width: 360px;
+  max-width: 92vw;
+  background: var(--card);
+  border: 1px solid #1f2a3a;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.brand {
+  margin: 0 0 4px;
+  font-size: 18px;
+  letter-spacing: 0.2px;
+  color: #e8ecf1;
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.title {
+  margin: 0 0 16px;
+  font-size: 20px;
+}
+
+label {
+  display: block;
+  margin: 10px 0 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+input {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  background: #0c1117;
+  border: 1px solid #243042;
+  color: var(--text);
+}
+
+.pw {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.link {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.space {
+  margin-top: 8px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.hint {
+  margin-top: 8px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.msg {
+  font-size: 12px;
+  margin-top: 10px;
+  min-height: 16px;
+}
+
+.msg.err {
+  color: var(--danger);
+}
+
+.msg.info {
+  color: #9fe5d8;
+}
+
+.submit {
+  width: 100%;
+  margin-top: 12px;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #131922;
+  border: 1px solid #263241;
+  color: var(--text);
+}
+
+.submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.swap {
+  text-align: center;
+  margin-top: 10px;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #243042;
+  border-radius: 12px;
+  background: #0c1117;
+  color: var(--text);
+}
+
+.pw {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pw input {
+  flex: 1 1 auto;
+} /* password row with “Show” button */
+
+/*# sourceMappingURL=auth.css.map */

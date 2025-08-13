@@ -1,0 +1,45 @@
+<!-- src/app/pages/upload/upload.html -->
+<div class="wrap">
+  <h1>Upload</h1>
+
+  <section class="picker">
+    <div class="dest">
+      <label class="opt">
+        <input type="radio" name="dest" value="new" [(ngModel)]="dest" />
+        <span>New pack</span>
+      </label>
+      <input class="title" *ngIf="dest==='new'" [(ngModel)]="packTitle" placeholder="Pack title" />
+    </div>
+
+    <div class="dest">
+      <label class="opt">
+        <input type="radio" name="dest" value="existing" [(ngModel)]="dest" />
+        <span>Add to existing</span>
+      </label>
+      <select *ngIf="dest==='existing'" [(ngModel)]="existingPackId">
+        <option value="" disabled>Select a pack…</option>
+        <option *ngFor="let p of myPacks()" [value]="p.id">{{p.title}}</option>
+      </select>
+    </div>
+  </section>
+
+  <section class="drop" (dragover)="onDragOver($event)" (drop)="onDrop($event)">
+    <input type="file" multiple (change)="onPick($event)" accept=".wav,.aiff,.aif,.mp3" />
+    <div>Drag & drop WAV/AIFF/MP3 or click to choose</div>
+  </section>
+
+  <div class="rows" *ngIf="rows().length">
+    <div class="row" *ngFor="let r of rows()">
+      <div class="name">{{r.name}}</div>
+      <div class="bar"><div class="fill" [style.width.%]="r.pct"></div></div>
+      <div class="pct" [class.ok]="r.status==='done'">{{r.pct}}%</div>
+    </div>
+  </div>
+
+  <div class="error" *ngIf="error()">{{error()}}</div>
+
+  <div class="actions">
+    <button class="btn" [disabled]="working()" (click)="start()">Start upload</button>
+    <a class="btn ghost" routerLink="/make">Cancel</a>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+<div class="wrap">
+  <div class="card">
+    <h2>Verify your email</h2>
+    <p>We sent a verification link to <b>{{email()}}</b>. Click it, then hit “I’ve verified”.</p>
+
+    <div class="row">
+      <button (click)="resend()" [disabled]="busy()">Resend email</button>
+      <button (click)="check()" [disabled]="busy()">I’ve verified</button>
+    </div>
+
+    <div class="msg" *ngIf="msg()">{{msg()}}</div>
+  </div>
+</div>

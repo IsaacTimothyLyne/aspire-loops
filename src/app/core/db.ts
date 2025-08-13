@@ -1,52 +1,89 @@
 import { Injectable, inject } from '@angular/core';
 import {
-  Firestore, collection, doc, setDoc, addDoc,
-  getDoc, getDocs                       // ✅ add these
+  Firestore,
+  collection, doc, setDoc, addDoc, getDoc, getDocs, updateDoc,
+  query, where, orderBy, limit, collectionData
 } from '@angular/fire/firestore';
-import { sha256 } from './hash';
+import { Storage, ref, getDownloadURL } from '@angular/fire/storage';
+import {catchError, firstValueFrom, map, Observable} from 'rxjs';
+import {Pack} from './models';
 
 @Injectable({ providedIn: 'root' })
 export class Db {
   private fs = inject(Firestore);
+  private storage = inject(Storage);
 
-  packsCol = collection(this.fs, 'packs');
-  itemsCol = (packId: string) => collection(this.fs, `packs/${packId}/items`);
-
+  // ---------- packs ----------
   async createPack(title: string, ownerUid = 'dev-user') {
-    const ref = doc(this.packsCol);
-    const pack = { id: ref.id, ownerUid, title, isPublic: false, createdAt: Date.now(), updatedAt: Date.now() };
-    await setDoc(ref, pack as any);
+    const packs = collection(this.fs, 'packs');               // AngularFire collection()
+    const refDoc = doc(packs);                                // AngularFire doc()
+    const pack = { id: refDoc.id, ownerUid, title, isPublic: false, createdAt: Date.now(), updatedAt: Date.now() };
+    await setDoc(refDoc, pack as any);
     return pack;
   }
 
-  async addItem(packId: string, item: any) {
-    const ref = doc(this.itemsCol(packId));
-    await setDoc(ref, { id: ref.id, ...item, createdAt: Date.now() } as any);
-  }
-
-  // ✅ READ: get a single pack
   async getPack(id: string) {
-    const snap = await getDoc(doc(this.packsCol, id));
+    const snap = await getDoc(doc(this.fs, 'packs', id));
     return snap.exists() ? (snap.data() as any) : null;
   }
 
-  // ✅ READ: list items in a pack
+  async updatePack(id: string, patch: any) {
+    await updateDoc(doc(this.fs, 'packs', id), { ...patch, updatedAt: Date.now() });
+  }
+  /** One-shot fetch for convenience (used by Upload page) */
+  async myPacks(uid: string, take = 50): Promise<any[]> {
+    return await firstValueFrom(this.myPacksStream(uid, take));
+  }
+  /** Live list of the user’s packs ordered by last update */
+  myPacksStream(uid: string, take = 50): Observable<Pack[]> {
+    const packs = collection(this.fs, 'packs');
+
+    const ordered = query(
+      packs as any,
+      where('ownerUid', '==', uid),
+      orderBy('updatedAt', 'desc'),
+      limit(take)
+    );
+
+    return collectionData(ordered, { idField: 'id' } as any) as Observable<Pack[]>;
+  }
+
+
+
+  // ---------- items ----------
+  itemsCol(packId: string) {
+    return collection(this.fs, `packs/${packId}/items`);
+  }
+
+  async addItem(packId: string, item: any) {
+    const refDoc = doc(this.itemsCol(packId));
+    await setDoc(refDoc, { id: refDoc.id, ...item, createdAt: Date.now() } as any);
+  }
+
   async listItems(packId: string) {
-    const snap = await getDocs(this.itemsCol(packId));
+    const snap = await getDocs(this.itemsCol(packId) as any);
     return snap.docs.map(d => d.data());
   }
 
-  // Share link
+  async updateItem(packId: string, itemId: string, patch: any) {
+    await updateDoc(doc(this.fs, `packs/${packId}/items/${itemId}`), patch);
+  }
+
+  async urlFor(storagePath: string) {
+    return await getDownloadURL(ref(this.storage, storagePath));
+  }
+
+  // ---------- shares ----------
   async createShareLink(packId: string, createdByUid: string, token: string, days = 14) {
     const shares = collection(this.fs, 'shareLinks');
     const data = {
       packId, createdByUid,
-      tokenHash: await sha256(token),
+      tokenHash: token,                        // replace with sha256 if you want
       expiresAt: Date.now() + days * 86400000,
       allowComments: true, allowZip: true,
       downloads: 0, createdAt: Date.now(),
     };
-    const ref = await addDoc(shares, data as any);
-    return ref.id;
+    const refDoc = await addDoc(shares as any, data as any);
+    return refDoc.id;
   }
 }
