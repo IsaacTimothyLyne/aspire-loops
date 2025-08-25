@@ -13,6 +13,7 @@
     "src/**/*.ts"
   ],
   "exclude": [
+    "functions/**",
     "src/**/*.spec.ts"
   ]
 }

@@ -1,0 +1,52 @@
+<!-- Dropzone (full-click area) -->
+<div
+  class="drop"
+  [class.hover]="isHover()"
+  role="button"
+  tabindex="0"
+  aria-label="Upload audio files"
+  (click)="pick()"
+  (keydown.enter)="pick()"
+  (keydown.space)="pick()"
+  (drop)="onDrop($event)"
+  (dragover)="onDragOver($event)"
+  (dragenter)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+>
+  <input #chooser type="file" [accept]="accept" multiple (change)="onPick($event)" />
+  <div class="msg">Drop audio here or click to upload</div>
+</div>
+
+<!-- Jobs / progress (rows fade then vanish after done/cancel) -->
+@if (visibleJobs().length) {
+  <div class="jobs" aria-live="polite">
+    @for (j of visibleJobs(); track j.id) {
+      <div class="job" [class.finishing]="finishing()[j.id]">
+        <div class="name">
+          {{ j.title || j.name || ('#' + (j.id || '').slice(0, 8)) }}
+          @if (j.size) { <small>&nbsp;• {{ j.size | number }} bytes</small> }
+        </div>
+
+        <div class="bar" aria-label="Upload progress" role="progressbar"
+             [attr.aria-valuemin]="0" [attr.aria-valuemax]="100"
+             [attr.aria-valuenow]="(j.progress * 100) | number:'1.0-0'">
+          <div class="fill" [style.width.%]="j.progress * 100"></div>
+        </div>
+
+        <div class="pct">{{ (j.progress * 100) | number:'1.0-0' }}%</div>
+
+        <button class="ghost" (click)="cancel(j.id)" aria-label="Cancel upload">Cancel</button>
+
+        @if (j.error) {
+          <div class="err">{{ j.error }}</div>
+        }
+      </div>
+    }
+
+    @if (uploadingCount()) {
+      <div class="footer-actions">
+        <button class="ghost small" (click)="cancelAll()">Cancel all</button>
+      </div>
+    }
+  </div>
+}

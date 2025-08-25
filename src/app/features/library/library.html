@@ -1,0 +1,323 @@
+<section class="library" (click)="closeMenu()">
+  <h2>Library</h2>
+
+  <app-uploader></app-uploader>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <input
+        class="search"
+        [value]="q()"
+        (input)="q.set(($any($event.target).value || '').toString())"
+        placeholder="Search title, tag, key, type, ext…"
+        inputmode="search"
+        aria-label="Search library"
+      />
+    </div>
+
+    <div class="sort">
+      <label>
+        <span>Sort</span>
+        <select [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+          <option value="recent">Recent</option>
+          <option value="title">Title</option>
+          <option value="bpm">BPM</option>
+          <option value="duration">Duration</option>
+        </select>
+      </label>
+      <button class="ghost tiny" (click)="sortDir.set(sortDir()==='asc'?'desc':'asc')">
+        {{ sortDir()==='asc' ? 'Asc' : 'Desc' }}
+      </button>
+    </div>
+
+    <button class="ghost" (click)="filtersOpen.set(!filtersOpen())">
+      {{ filtersOpen() ? 'Hide' : 'Show' }} Filters
+    </button>
+  </div>
+
+  <!-- Active filter pills -->
+  <div class="active-filters" *ngIf="q() || typeSet().size || tagSet().size || keySet().size || bpmEnabled()">
+    <span class="pill" *ngIf="q()">
+      “{{ q() }}”
+      <button (click)="q.set('')" aria-label="Clear search">×</button>
+    </span>
+
+    <ng-container *ngFor="let t of allTypes()">
+      <span class="pill" *ngIf="typeSet().has(t)">
+        {{ t }}
+        <button (click)="toggleType(t)" aria-label="Remove type">×</button>
+      </span>
+    </ng-container>
+
+    <ng-container *ngFor="let tg of allTags()">
+      <span class="pill" *ngIf="tagSet().has(tg.name)">
+        #{{ tg.name }}
+        <button (click)="toggleTag(tg.name)" aria-label="Remove tag">×</button>
+      </span>
+    </ng-container>
+
+    <ng-container *ngFor="let k of allKeys()">
+      <span class="pill" *ngIf="keySet().has(k)">
+        {{ k }}
+        <button (click)="toggleKey(k)" aria-label="Remove key">×</button>
+      </span>
+    </ng-container>
+
+    <span class="pill" *ngIf="bpmEnabled()">
+      BPM {{ bpmMin() }}–{{ bpmMax() }} <span *ngIf="includeUnknownBpm()">+ unk</span>
+      <button (click)="bpmEnabled.set(false)" aria-label="Disable BPM">×</button>
+    </span>
+
+    <button class="ghost tiny" (click)="clearFilters()" aria-label="Clear all">Clear all</button>
+  </div>
+
+  <!-- Filters panel -->
+  <div class="filters" *ngIf="filtersOpen()">
+    <div class="group">
+      <div class="label">Type</div>
+      <div class="chips">
+        <button
+          class="chip"
+          *ngFor="let t of allTypes()"
+          [class.on]="typeSet().has(t)"
+          (click)="toggleType(t)">{{ t }}</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="label">Tags</div>
+      <div class="tags">
+        <button
+          class="tag-chip"
+          *ngFor="let tg of allTags()"
+          [class.on]="tagSet().has(tg.name)"
+          (click)="toggleTag(tg.name)">
+          #{{ tg.name }} <span class="cnt">{{ tg.count }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="group bpm">
+      <div class="label">BPM</div>
+      <label class="row">
+        <input type="checkbox" [checked]="bpmEnabled()" (change)="bpmEnabled.set($any($event.target).checked)">
+        <span>Enable</span>
+      </label>
+      <div class="range" [class.disabled]="!bpmEnabled()">
+        <input type="number" [ngModel]="bpmMin()" (ngModelChange)="bpmMin.set(Math.max(0, +$event||0))">
+        <span>—</span>
+        <input type="number" [ngModel]="bpmMax()" (ngModelChange)="bpmMax.set(Math.max(bpmMin(), +$event||0))">
+        <label class="chk">
+          <input type="checkbox" [checked]="includeUnknownBpm()" (change)="includeUnknownBpm.set($any($event.target).checked)">
+          <span>Include unknown</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="label">Key</div>
+      <div class="chips">
+        <button
+          class="chip"
+          *ngFor="let k of allKeys()"
+          [class.on]="keySet().has(k)"
+          (click)="toggleKey(k)">{{ k }}</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results count -->
+  <div class="result-count" *ngIf="hasFiles()">
+    {{ visible().length }} result{{ visible().length===1 ? '' : 's' }}
+  </div>
+
+  <!-- Rows -->
+  @if (isLoading()) {
+    <div class="list">
+      @for (i of [0,1,2,3]; track i) {
+        <div class="row skeleton">
+          <div class="c name">
+            <div class="title sk"></div>
+            <div class="sub sk"></div>
+          </div>
+          <div class="c bpm sk"></div>
+          <div class="c key sk"></div>
+          <div class="c tags"><div class="tag sk"></div><div class="tag sk"></div></div>
+          <div class="c meta sk"></div>
+          <div class="c created sk"></div>
+          <div class="c actions"><div class="btn sk"></div><div class="btn sk"></div></div>
+        </div>
+      }
+    </div>
+  } @else if (hasFiles()) {
+    @if (visible().length === 0) {
+      <div class="empty narrow">
+        <h4>No matches</h4>
+        <p class="muted">Try widening your filters or clearing them.</p>
+        <button class="ghost" (click)="clearFilters()">Clear all filters</button>
+      </div>
+    } @else {
+      <div class="list">
+        <div class="row head">
+          <div class="c name">Name</div>
+          <div class="c bpm">BPM</div>
+          <div class="c key">Key</div>
+          <div class="c tags">Tags</div>
+          <div class="c meta">Type</div>
+          <div class="c created">Created</div>
+          <div class="c actions"></div>
+        </div>
+
+        @for (f of visible(); track f.id) {
+          <div
+            class="row"
+            [class.playing]="isCurrent(f)"
+            (contextmenu)="openMenu($event, f)"
+            (dblclick)="playIfReady(f)"
+            tabindex="0"
+            (keydown)="onRowKey($event, f)"
+            aria-label="Track row"
+          >
+            <div class="c name">
+              <div class="title" (click)="playIfReady(f)">
+                <span class="dot playing" *ngIf="isCurrent(f)">●</span>
+                {{ displayName(f) }}
+              </div>
+              <div class="sub">
+                {{ f.ext || (f.mime || 'audio') }} • {{ formatBytes(f.size) }}
+                <span *ngIf="f.duration">&nbsp;• {{ formatDuration(f.duration) }}</span>
+              </div>
+            </div>
+
+            <div class="c bpm">{{ f.bpm ?? '—' }}</div>
+            <div class="c key">{{ f.key || '—' }}</div>
+
+            <div class="c tags">
+              @if ((f.tags || []).length) {
+                @for (t of visibleTags(f, 2); track t) {
+                  <span class="tag" [title]="t">{{ truncateTag(t) }}</span>
+                }
+                @if (hiddenTagCount(f, 2) > 0) {
+                  <span class="tag more" [title]="(f.tags || []).join(', ')">
+                    +{{ hiddenTagCount(f, 2) }}
+                  </span>
+                }
+              } @else { <span class="muted">—</span> }
+            </div>
+
+            <div class="c meta">
+              <span class="chip">{{ f.type || 'audio' }}</span>
+            </div>
+
+            <div class="c created">{{ f.createdAt | date:'mediumDate' }}</div>
+
+            <div class="c actions">
+              <button
+                class="icon-btn"
+                [attr.aria-label]="isCurrent(f) ? 'Pause' : 'Play'"
+                [attr.aria-pressed]="isCurrent(f)"
+                (click)="toggle(f)"
+              >
+                <svg *ngIf="!isCurrent(f)" viewBox="0 0 24 24" class="icon" aria-hidden="true">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+                <svg *ngIf="isCurrent(f)" viewBox="0 0 24 24" class="icon" aria-hidden="true">
+                  <path d="M6 5h4v14H6zM14 5h4v14h-4z"/>
+                </svg>
+              </button>
+
+              <button class="icon kebab" (click)="openMenu($event, f)" aria-label="More">•••</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <div class="empty">
+      <div class="art"></div>
+      <h4>No files yet</h4>
+      <p class="muted">Start by uploading a file.</p>
+    </div>
+  }
+
+  <!-- Context menu -->
+  @if (menuOpen()) {
+    <div class="ctx-backdrop" (click)="closeMenu()"></div>
+    <div class="ctx" [style.left.px]="menuX()" [style.top.px]="menuY()">
+      <button class="item" (click)="playIfReady(selected()!); closeMenu()">Play</button>
+      <button class="item" (click)="openEdit(selected()!)">Edit</button>
+      <button class="item" (click)="startRename(selected()!)">Rename</button>
+      <button class="item" (click)="share(selected()!)">Share</button>
+      <hr class="divider"/>
+      <button class="item danger" (click)="remove(selected()!)">Delete</button>
+    </div>
+  }
+
+  <!-- Edit modal -->
+  @if (edit()) {
+    <div class="sheet-backdrop" (click)="closeEdit()"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="edit-title">
+      <h3>Edit file</h3>
+
+      <label>
+        <span>Title</span>
+        <input id="edit-title" [(ngModel)]="edit()!.title" placeholder="Title">
+      </label>
+
+      <div class="grid">
+        <label>
+          <span>BPM</span>
+          <input type="number" [(ngModel)]="edit()!.bpm" placeholder="—">
+        </label>
+        <label>
+          <span>Key</span>
+          <input [(ngModel)]="edit()!.key" placeholder="e.g., Am">
+        </label>
+      </div>
+
+      <label>
+        <span>Type</span>
+        <input [(ngModel)]="edit()!.type" list="type-options" placeholder="audio / loop / mix / …">
+        <datalist id="type-options">
+          @for (t of TYPE_OPTIONS; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </datalist>
+      </label>
+
+      <label>
+        <span>Tags</span>
+        <input [(ngModel)]="edit()!.tags" placeholder="tag1, tag2">
+      </label>
+
+      <div class="actions">
+        <button class="ghost" (click)="closeEdit()">Cancel</button>
+        <button class="primary" (click)="saveEdit()">Save</button>
+      </div>
+    </div>
+  }
+
+</section>
+
+<!-- Share modal -->
+<div class="sheet-backdrop" *ngIf="shareSheet()" (click)="shareSheet.set(null)"></div>
+<div class="sheet" *ngIf="shareSheet()">
+  <h3>Share link</h3>
+  <div *ngIf="shareSheet()?.loading">Creating link…</div>
+
+  <div *ngIf="!shareSheet()?.loading">
+    <label>
+      <span>Link</span>
+      <input [value]="shareSheet()?.link || ''" readonly (focus)="$any($event.target).select()">
+    </label>
+
+    <div class="actions">
+      <button class="ghost" (click)="navigator.clipboard.writeText(shareSheet()?.link||'')">Copy</button>
+      <a class="ghost" [href]="shareSheet()?.link" target="_blank">Open</a>
+      <span style="flex:1"></span>
+      <button class="primary" (click)="shareSheet.set(null)">Done</button>
+      <button class="ghost" (click)="revokeShare()">Revoke</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<section class="share">
+  @if (share(); as s) {
+    <header class="header">
+      <div class="art" [style.background]="coverFor(s.title)"></div>
+      <div class="meta">
+        <h1>{{ s.title }}</h1>
+        <div class="chips">
+          @if (s.kind === 'file' && s.type)     { <span class="chip">{{ s.type }}</span> }
+          @if (s.kind === 'file' && s.duration) { <span class="chip">{{ s.duration | number:'1.0-0' }}s</span> }
+          <span class="chip muted">{{ s.kind === 'pack' ? 'Pack' : 'Original' }}</span>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" (click)="toggle()">Play</button>
+          <a class="btn" routerLink="/app/library">Open app</a>
+          <a class="btn ghost" *ngIf="s.url" [href]="s.url" rel="noopener" target="_blank">Download</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="list">
+      @for (t of tracks(); track t.id) {
+        <button class="row" (click)="playIndex($index)">
+          <div class="bullet"></div>
+          <div class="title">{{ t.title || 'Untitled' }}</div>
+          <div class="meta">{{ t.duration ? (t.duration | number:'1.0-0') + 's' : '' }}</div>
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="skeleton">
+      <div class="art"></div>
+      <div class="lines"><div class="line"></div><div class="line sm"></div></div>
+    </div>
+  }
+</section>
+
+<!-- Sticky shared player -->
+<app-bottom-player></app-bottom-player>

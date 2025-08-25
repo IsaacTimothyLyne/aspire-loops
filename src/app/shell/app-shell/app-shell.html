@@ -1,0 +1,14 @@
+<div class="layout">
+    <aside class="sidenav">
+        <a routerLink="/app/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/app/library" routerLinkActive="active">Library</a>
+    </aside>
+
+    <main class="content">
+        <div class="page">
+            <router-outlet></router-outlet>
+        </div>
+    </main>
+
+    <app-bottom-player></app-bottom-player>
+</div>

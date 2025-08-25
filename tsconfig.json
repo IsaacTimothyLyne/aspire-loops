@@ -16,7 +16,14 @@
     "useDefineForClassFields": false,
     "target": "ES2022",
     "module": "ES2022",
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "baseUrl": "src",
+    "paths": {
+      "@app/*": ["app/*"],
+      "@core/*": ["app/core/*"],
+      "@shared/*": ["app/shared/*"],
+      "@features/*": ["app/features/*"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

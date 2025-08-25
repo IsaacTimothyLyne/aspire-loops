@@ -1,0 +1,134 @@
+<section class="builder">
+  <!-- LEFT -->
+  <div class="left">
+    <header class="hdr">
+      <h2>New Pack</h2>
+      <div class="actions">
+        <button class="ghost" routerLink="/app/dashboard">Cancel</button>
+        <button class="primary" [disabled]="creating()" (click)="create(true)">
+          {{ creating() ? 'Creating…' : 'Create Pack' }}
+        </button>
+      </div>
+    </header>
+
+    <div class="form">
+      <!-- artwork -->
+      <div class="artwork">
+        <div class="thumb" [class.empty]="!artworkUrl()">
+          <img *ngIf="artworkUrl()" [src]="artworkUrl()!" alt="Artwork preview">
+          <span *ngIf="!artworkUrl()">No artwork</span>
+        </div>
+        <label class="upload">
+          <input type="file" accept="image/*" (change)="onArtworkFile($any($event.target).files?.[0])">
+          Upload artwork
+        </label>
+      </div>
+
+      <!-- fields -->
+      <div class="fields">
+        <label>
+          <span>Title</span>
+          <input [ngModel]="title()" (ngModelChange)="title.set($event)" placeholder="My Loop Pack">
+        </label>
+
+        <div class="grid2">
+          <label>
+            <span>Producer</span>
+            <input [ngModel]="producer()" (ngModelChange)="producer.set($event)" placeholder="e.g., Your Name">
+          </label>
+          <label>
+            <span>Publisher</span>
+            <input [ngModel]="publisher()" (ngModelChange)="publisher.set($event)" placeholder="Label / Publisher">
+          </label>
+        </div>
+
+        <div class="grid2">
+          <label>
+            <span>Year</span>
+            <input inputmode="numeric" [ngModel]="year()" (ngModelChange)="year.set($event)" placeholder="2025">
+          </label>
+          <label class="chk">
+            <input type="checkbox" [checked]="isPublic()" (change)="isPublic.set($any($event.target).checked)">
+            <span>Public</span>
+          </label>
+        </div>
+
+        <label>
+          <span>Tags</span>
+          <input [ngModel]="tagsInput()" (ngModelChange)="tagsInput.set($event)" placeholder="house, techno, 128bpm">
+        </label>
+
+        <label>
+          <span>Notes</span>
+          <textarea rows="3" [ngModel]="desc()" (ngModelChange)="desc.set($event)"
+                    placeholder="Describe the pack…"></textarea>
+        </label>
+      </div>
+    </div>
+
+    <h3 class="section">Pack tracks</h3>
+
+    <!-- Pack dropzone (reorder in-place; accepts drags from library) -->
+    <div class="dropzone"
+         cdkDropList
+         id="packDrop"
+         [cdkDropListData]="chosen()"
+         [cdkDropListConnectedTo]="['libDrop']"
+         [cdkDropListEnterPredicate]="enterAny"
+         (cdkDropListDropped)="onDropPack($event)">
+
+      <div class="chosen-empty" *ngIf="!chosen().length">
+        Drag tracks here or click “+” in the library →
+      </div>
+
+      <div class="row" *ngFor="let it of chosen(); let i = index; trackBy: trackById" cdkDrag cdkDragLockAxis="y">
+        <div class="grab" cdkDragHandle>⋮⋮</div>
+        <div class="title">{{ displayName(it) }}</div>
+        <div class="meta">
+          <span *ngIf="it.bpm">{{ it.bpm }} bpm</span>
+          <span *ngIf="it.key">{{ it.key }}</span>
+        </div>
+        <div class="actions">
+          <button class="ghost" (click)="preview(it)">Play</button>
+          <button class="ghost danger" (click)="remove(i)">Remove</button>
+        </div>
+      </div>
+    </div>
+  </div> <!-- /left -->
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="lib-head">
+      <h3>Library</h3>
+      <input class="search" [ngModel]="libQuery()" (ngModelChange)="libQuery.set($event)" placeholder="Search…">
+    </div>
+
+    <!-- Library as a source list (drag out only) -->
+    <div class="lib"
+         cdkDropList
+         id="libDrop"
+         [cdkDropListData]="filteredLib()"
+         [cdkDropListConnectedTo]="['packDrop']"
+         [cdkDropListSortingDisabled]="true"
+         [cdkDropListEnterPredicate]="noEnter">
+
+      <div class="lib-row"
+           *ngFor="let f of filteredLib(); trackBy: trackById"
+           cdkDrag
+           [cdkDragData]="f">
+        <div class="meta">
+          <div class="title" [title]="displayName(f)">{{ displayName(f) }}</div>
+          <div class="sub">
+            <span *ngIf="f.bpm">{{ f.bpm }} bpm</span>
+            <span *ngIf="f.key"> · {{ f.key }}</span>
+            <span *ngIf="f.duration"> · {{ f.duration | number:'1.0-0' }}s</span>
+          </div>
+        </div>
+        <div class="lib-actions">
+          <button class="ghost" (click)="preview(f)">Play</button>
+          <button class="primary" (click)="add(f)">+</button>
+        </div>
+      </div>
+    </div>
+  </div> <!-- /right -->
+</section>

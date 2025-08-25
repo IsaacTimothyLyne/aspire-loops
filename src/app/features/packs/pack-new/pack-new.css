@@ -1,0 +1,265 @@
+:host {
+  display: block;
+}
+
+/* 2-column builder */
+.builder {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 16px;
+  min-height: calc(100dvh - 140px);
+}
+
+/* columns */
+.left {
+  padding: 16px 12px 24px;
+}
+
+.right {
+  border-left: 1px solid var(--hair, rgba(255, 255, 255, 0.08));
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  /* optional: keep the library visible as you scroll */
+  position: sticky;
+  top: 12px;
+  align-self: start;
+  max-height: calc(100dvh - 140px);
+}
+
+/* header */
+.hdr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.hdr h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* buttons (dark) */
+.btn, .ghost, .primary {
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.12));
+  background: transparent;
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.primary {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.primary:hover, .primary:focus {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.ghost.danger {
+  border-color: #c66;
+  color: #f66;
+}
+
+/* form */
+.form {
+  display: grid;
+  grid-template-columns: 164px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.artwork {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.thumb {
+  width: 164px;
+  height: 164px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.08));
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumb.empty {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+}
+
+.upload input {
+  display: none;
+}
+
+.upload {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.fields input, .fields textarea, .search {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.12));
+  background: transparent;
+  color: inherit;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.chk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.section {
+  margin: 18px 0 8px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* pack list (drop zone) */
+.dropzone {
+  border: 1px dashed var(--hair, rgba(255, 255, 255, 0.16));
+  border-radius: 12px;
+  padding: 6px;
+  min-height: 120px;
+}
+
+.chosen-empty {
+  opacity: 0.6;
+  padding: 10px;
+  font-size: 13px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 24px 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.row + .row {
+  margin-top: 4px;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.grab {
+  cursor: grab;
+  opacity: 0.6;
+}
+
+.meta {
+  opacity: 0.8;
+  font-size: 12px;
+}
+
+.row .actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* right column (library) */
+.lib-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.lib-head h3 {
+  margin: 0;
+}
+
+.search {
+  margin-left: auto;
+  max-width: 200px;
+}
+
+.lib {
+  overflow: auto;
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* nice scrolling on long lists */
+  scrollbar-gutter: stable;
+}
+
+.lib-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+}
+
+.lib-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.lib-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* visual pulse when an item is added */
+.row.added {
+  animation: pulse 320ms ease-out;
+}
+
+@keyframes pulse {
+  from {
+    background: rgba(255, 255, 255, 0.07);
+  }
+  to {
+    background: transparent;
+  }
+}
+
+/*# sourceMappingURL=pack-new.css.map */

@@ -1,0 +1,111 @@
+@charset "UTF-8";
+/* ====== Layout tokens ====== */
+.layout {
+  --nav-w: 240px; /* sidenav width */
+  --player-h: 72px; /* bottom player height */
+  --divider: 1px; /* divider between sidenav & bottom-player */
+  --radius: 14px;
+  --line: rgba(255,255,255,0.08);
+  --bg-1: rgba(255,255,255,0.02);
+  /* 2 columns; player is fixed (not part of grid rows) */
+  display: grid;
+  grid-template-columns: var(--nav-w) 1fr;
+  grid-template-rows: 1fr;
+  grid-template-areas: "nav main";
+  height: 100vh; /* full viewport height */
+  min-height: 0;
+  background: #0d0f14;
+}
+
+/* ====== Sidenav ====== */
+.sidenav {
+  grid-area: nav;
+  position: relative; /* make sure it’s NOT fixed */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  padding-bottom: calc(16px + var(--player-h)); /* keep clear of player */
+  border-right: var(--divider) solid var(--line);
+  background: linear-gradient(180deg, var(--bg-1), transparent);
+  overflow: auto; /* its own scroll if long */
+  min-height: 0;
+}
+
+.sidenav a {
+  display: block;
+  padding: 12px 14px;
+  border-radius: var(--radius);
+  color: #cfd6e6;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.sidenav a:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: var(--line);
+}
+
+.sidenav a.active { /* works with routerLinkActive="active" */
+  background: rgba(60, 145, 255, 0.1);
+  border-color: rgba(60, 145, 255, 0.35);
+  color: #e9f2ff;
+}
+
+/* ====== Main content ====== */
+.content {
+  grid-area: main;
+  padding: 24px 28px;
+  padding-bottom: calc(28px + var(--player-h)); /* reserve space for player */
+  overflow: auto; /* scrolls without pushing the player */
+  min-width: 0; /* prevent overflow pushing layout wider */
+  min-height: 0;
+}
+
+/* Optional: consistent inner width */
+.content > .page {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* ====== Bottom player (fixed) ====== */
+app-bottom-player {
+  position: fixed;
+  left: calc(var(--nav-w) + var(--divider));
+  right: 0;
+  bottom: 0;
+  height: var(--player-h);
+  display: block;
+  border-top: 1px solid var(--line);
+  background: rgba(9, 11, 15, 0.8);
+  backdrop-filter: saturate(120%) blur(10px);
+  z-index: 20; /* above content */
+}
+
+/* Player element should fill its host from within */
+app-bottom-player, app-bottom-player * {
+  box-sizing: border-box;
+}
+
+/* ====== Responsive: collapse nav ====== */
+@media (max-width: 900px) {
+  .layout {
+    --nav-w: 200px;
+    --player-h: 64px;
+  }
+}
+@media (max-width: 720px) {
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-areas: "main";
+  }
+  .sidenav {
+    display: none;
+  }
+  app-bottom-player {
+    left: 0; /* full width when nav hidden */
+  }
+}
+
+/*# sourceMappingURL=app-shell.css.map */

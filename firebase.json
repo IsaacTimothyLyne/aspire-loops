@@ -20,7 +20,7 @@
     }
   ],
   "hosting": {
-    "public": "public",
+    "public": "dist/aspire-loops/browser",
     "ignore": [
       "firebase.json",
       "**/.*",

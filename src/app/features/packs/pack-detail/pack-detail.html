@@ -1,0 +1,74 @@
+<section class="pack">
+  <!-- HERO -->
+  <header class="hero">
+    <div class="cover" [style.background]="coverFor(pack()?.title || 'x')">
+      <img *ngIf="pack()?.artworkUrl" [src]="pack()?.artworkUrl" alt="" />
+    </div>
+
+    <div class="hdr">
+      <h1>{{ pack()?.title || 'Untitled pack' }}</h1>
+
+      <div class="chips">
+        <span class="chip" *ngIf="pack()?.bpmMin != null">
+          {{ pack()?.bpmMin }}–{{ pack()?.bpmMax ?? pack()?.bpmMin }} BPM
+        </span>
+        <span class="chip" *ngIf="pack()?.keys?.length">{{ pack()?.keys.join(', ') }}</span>
+        <span class="chip muted">{{ pack()?.isPublic ? 'Public' : 'Private' }}</span>
+        <span class="chip muted">{{ items().length }} tracks</span>
+      </div>
+
+      <div class="actions">
+        <button class="primary" (click)="createShare()" [disabled]="sharing()">
+          {{ sharing() ? 'Creating…' : 'Create share' }}
+        </button>
+        <a class="ghost" *ngIf="shareLink()" [href]="shareLink()" target="_blank" rel="noopener">Open share</a>
+        <button class="ghost danger" (click)="deletePack()" [disabled]="deleting()">  <!-- ← new -->
+          {{ deleting() ? 'Deleting…' : 'Delete pack' }}
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <ng-container *ngIf="!loading(); else loadingTpl">
+    <div class="list">
+      <div
+        class="row"
+        *ngFor="let it of items(); let i = index"
+        (dblclick)="play(it)"
+      >
+        <div class="idx">{{ i + 1 }}</div>
+
+        <button class="play" (click)="play(it)" [attr.aria-pressed]="isCurrent(it)">
+          <svg *ngIf="!isCurrent(it)" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+          <svg *ngIf="isCurrent(it)" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+        </button>
+
+        <div class="title" [title]="titleOf(it)">{{ titleOf(it) }}</div>
+
+        <div class="meta">
+          <span *ngIf="it.bpm">{{ it.bpm }} bpm</span>
+          <span *ngIf="it.key"> • {{ it.key }}</span>
+          <ng-container *ngFor="let t of (it.tags || [])">
+            <span class="tag">{{ t }}</span>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #loadingTpl>
+    <div class="loading">
+      <div class="sk line"></div>
+      <div class="sk line"></div>
+      <div class="sk line"></div>
+    </div>
+  </ng-template>
+
+  <!-- Inline share result -->
+  <div class="sharebar" *ngIf="shareLink()">
+    <input [value]="shareLink()!" readonly (focus)="$any($event.target).select()">
+    <button class="ghost" (click)="navigator.clipboard.writeText(shareLink()!)">Copy</button>
+    <a class="primary" [href]="shareLink()!" target="_blank" rel="noopener">Open</a>
+  </div>
+</section>

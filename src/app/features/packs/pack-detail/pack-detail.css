@@ -1,0 +1,201 @@
+@charset "UTF-8";
+:host {
+  display: block;
+}
+
+.pack {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 16px 12px 32px;
+}
+
+/* HERO */
+.hero {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.08));
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: 16px;
+}
+
+.cover {
+  height: 160px;
+  background: linear-gradient(135deg, hsl(280, 70%, 45%), hsl(340, 70%, 52%));
+  filter: saturate(1.1);
+}
+
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hdr {
+  padding: 16px;
+}
+
+.hdr h1 {
+  margin: 0 0 6px;
+  font-size: 24px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.chip {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.14));
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.chip.muted {
+  opacity: 0.75;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons */
+.primary, .ghost {
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.12));
+  background: transparent;
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.primary {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.primary:hover, .primary:focus {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* LIST */
+.list {
+  margin-top: 8px;
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 32px 40px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.row + .row {
+  border-top: 1px solid var(--hair, rgba(255, 255, 255, 0.06));
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.idx {
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.play {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.14));
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.play svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.title {
+  font-weight: 600;
+}
+
+.meta {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.tag {
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.14));
+}
+
+/* Loading skeleton */
+.loading .sk.line {
+  height: 44px;
+  margin: 6px 0;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+  background-size: 200% 100%;
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+/* Share bar */
+.sharebar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+  padding: 8px;
+  border: 1px dashed var(--hair, rgba(255, 255, 255, 0.16));
+  border-radius: 12px;
+}
+
+.sharebar input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--hair, rgba(255, 255, 255, 0.12));
+  background: transparent;
+  color: inherit;
+}
+
+/* existing button styles above… */
+.ghost.danger {
+  border-color: #c66;
+  color: #f66;
+}
+
+.ghost.danger:hover {
+  background: rgba(255, 80, 80, 0.08);
+}
+
+/*# sourceMappingURL=pack-detail.css.map */

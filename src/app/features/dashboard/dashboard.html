@@ -1,0 +1,110 @@
+<div class="wrap">
+  <header class="top">
+    <div class="greet">
+      <h1>Welcome back@if (userEmail()) {, {{ userEmail() }}
+      }</h1>
+      <p class="muted">Make • organize • send — faster than email threads.</p>
+    </div>
+
+    <div class="actions">
+      <a class="btn primary" routerLink="/app/pack/new">+ New Pack</a>
+      <a class="btn" routerLink="/app/library">Upload</a>
+      <button class="btn ghost" (click)="share()">Create Share</button>
+    </div>
+  </header>
+
+  <section class="toolbar">
+    <div class="search">
+      <input
+        #searchBox
+        [value]="q()"
+        (input)="onInput(($any($event.target).value || '').toString())"
+        placeholder="Search title, tag, key, BPM…"
+        autocomplete="off"
+        inputmode="search"
+        aria-label="Search packs"
+      />
+    </div>
+
+    <div class="filters" role="tablist" aria-label="Visibility filter">
+      <button
+        class="chip"
+        [class.on]="filter() === 'all'"
+        (click)="setFilter('all')"
+        role="tab"
+        [attr.aria-selected]="filter() === 'all'"
+      >All
+      </button>
+
+      <button
+        class="chip"
+        [class.on]="filter() === 'private'"
+        (click)="setFilter('private')"
+        role="tab"
+        [attr.aria-selected]="filter() === 'private'"
+      >Private
+      </button>
+
+      <button
+        class="chip"
+        [class.on]="filter() === 'public'"
+        (click)="setFilter('public')"
+        role="tab"
+        [attr.aria-selected]="filter() === 'public'"
+      >Public
+      </button>
+    </div>
+
+  </section>
+
+  <h3 class="section">In Progress</h3>
+
+  @if (loading()) {
+    <div class="grid">
+      @for (i of SKELETONS; track i) {
+        <div class="card skeleton" aria-hidden="true">
+          <div class="cover"></div>
+          <div class="meta">
+            <div class="line"></div>
+            <div class="line sm"></div>
+          </div>
+          <div class="badges"></div>
+        </div>
+      }
+    </div>
+  } @else {
+    @if (packs().length) {
+      <div class="grid">
+        @for (p of packs(); track p.id) {
+          <a
+            class="card"
+            [routerLink]="['/app/packs', p.id]"
+            [title]="(p.title || 'Untitled pack') + ' • Updated ' + (p.updatedAt | date:'medium')"
+          >
+            <div class="cover" [style.background]="coverFor(p.title)"></div>
+            <div class="meta">
+              <div class="title">{{ p.title || 'Untitled pack' }}</div>
+              <div class="sub">
+                {{ p.bpmMin ?? '—' }}–{{ p.bpmMax ?? '—' }} BPM · {{ p.keys?.[0] || '—' }}
+              </div>
+            </div>
+            <div class="badges">
+              <span class="badge" [class.pub]="p.isPublic">{{ p.isPublic ? 'Public' : 'Private' }}</span>
+              <span class="ago" [title]="(p.updatedAt | date:'fullDate')">{{ p.updatedAt | date:'MMM d' }}</span>
+            </div>
+          </a>
+        }
+      </div>
+    } @else {
+      <div class="empty">
+        <div class="art"></div>
+        <h4>No packs yet</h4>
+        <p class="muted">Start by creating a pack or uploading some loops.</p>
+        <div class="row">
+          <a class="btn primary" routerLink="/pack/new">Create your first pack</a>
+          <a class="btn" routerLink="/upload">Upload files</a>
+        </div>
+      </div>
+    }
+  }
+</div>

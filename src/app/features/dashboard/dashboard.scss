@@ -1,0 +1,97 @@
+:root {
+  --bg:#0f1216; --card:#151a20; --text:#e8ecf1; --muted:#9fb0c0; --line:#1f2a3a; --accent:#2dd4bf;
+}
+
+.wrap {
+  padding: 24px;
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ---------- header ---------- */
+.top {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 14px;
+  .greet h1 { margin: 0; font-size: 24px; letter-spacing: .2px; }
+  .greet .muted { color: var(--muted); margin: 4px 0 0; }
+}
+
+.actions { display:flex; gap:10px; }
+.btn {
+  background:#131922; border:1px solid #263241; color:var(--text); border-radius:12px;
+  padding:.6rem 1rem; cursor:pointer; text-decoration:none; transition: border-color .12s ease, background-color .12s ease;
+  &:focus-visible { outline: 2px solid color-mix(in oklab, var(--accent) 60%, white); outline-offset: 2px; }
+}
+.btn.primary { border-color:#2dd4bf55; box-shadow: 0 0 0 1px #2dd4bf22 inset; }
+.btn.ghost { background:transparent; }
+
+/* ---------- toolbar ---------- */
+.toolbar {
+  display:flex; justify-content:space-between; align-items:center; gap:16px; margin:10px 0 6px;
+}
+.search input {
+  width:420px; max-width: min(60vw, 520px);
+  background:#0c1117; border:1px solid #243042; border-radius:12px; color:var(--text);
+  padding:.6rem .9rem; transition: border-color .12s ease, box-shadow .12s ease;
+  &:focus { border-color: color-mix(in oklab, var(--accent) 45%, #243042); box-shadow: 0 0 0 3px rgba(45,212,191,.15); }
+}
+.filters { display:flex; gap:8px; }
+.chip {
+  background:#0f141b; color:#a9bdcf; border:1px solid #1c2735; border-radius:999px; padding:.35rem .7rem; cursor:pointer;
+  transition: border-color .12s ease, background-color .12s ease, color .12s ease;
+  &:focus-visible { outline: 2px solid color-mix(in oklab, var(--accent) 60%, white); outline-offset: 2px; }
+}
+.chip.on { color:var(--text); border-color:#2dd4bf66; background:#111823; }
+
+/* ---------- section title ---------- */
+.section { margin:14px 0 10px; color:#bcd; font-size:14px; font-weight:600; letter-spacing:.2px; }
+
+/* ---------- grid of cards ---------- */
+.grid {
+  display:grid; gap:12px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.card {
+  display:grid; grid-template-columns:56px 1fr auto; gap:12px; align-items:center;
+  background:#121821; border:1px solid #1e2a38; border-radius:14px; padding:12px;
+  color:var(--text); text-decoration:none; transition: border-color .15s ease, transform .06s ease;
+  &:hover { border-color:#2b3a4d; }
+  &:active { transform: translateY(1px); }
+  &:focus-visible { outline: 2px solid color-mix(in oklab, var(--accent) 55%, white); outline-offset: 2px; }
+}
+
+.cover { width:56px; height:56px; border-radius:12px; }
+
+.meta .title { font-weight:700; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.meta .sub   { color:var(--muted); font-size:12px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+.badges { display:flex; gap:10px; align-items:center; }
+.badge  { font-size:11px; padding:.2rem .5rem; border-radius:999px; background:#0f141b; border:1px solid #1c2735; color:#a9bdcf; }
+.badge.pub { border-color:#2dd4bf66; color:#d7fff6; }
+.ago    { color:#94a9bd; font-size:12px; }
+
+/* ---------- skeletons ---------- */
+.skeleton { pointer-events:none; }
+.skeleton .cover,
+.skeleton .line {
+  background: linear-gradient(90deg,#19212b,#1c2732 40%,#19212b 70%); background-size:200% 100%; animation: sh 1.2s infinite;
+}
+.skeleton .line { height:12px; width:75%; border-radius:6px; }
+.skeleton .line.sm { width:40%; margin-top:8px; }
+@keyframes sh { 0% { background-position:200% 0 } 100% { background-position:-200% 0 } }
+
+/* ---------- empty state ---------- */
+.empty {
+  text-align:center; padding:40px 16px; border:1px dashed #2a384b; border-radius:14px; background:#0e131a;
+  .art { width:80px; height:80px; margin:0 auto 10px; border-radius:16px;
+    background:conic-gradient(from 0deg at 50% 50%, #2dd4bf, #60a5fa, #a78bfa, #f472b6, #2dd4bf); filter:saturate(1.2);
+  }
+  .row { display:flex; gap:10px; justify-content:center; margin-top:10px; }
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 860px) {
+  .top { flex-direction: column; align-items: stretch; gap: 10px; }
+  .actions { align-self: flex-end; }
+  .search input { width: 100%; max-width: 100%; }
+}

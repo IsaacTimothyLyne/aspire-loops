@@ -1,0 +1,157 @@
+@charset "UTF-8";
+/* src/app/shared/ui/bottom-player/bottom-player.scss */
+:host {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  /* Glassy, super minimal */
+  background: rgba(10, 14, 20, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid #1f2a3a;
+  /* Safe area and compact height */
+  --h: 84px;
+  padding: 10px max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left));
+  height: var(--h);
+  color: var(--text, #e8ecf1);
+}
+
+/* Three clean columns: title | wave | controls */
+.bar {
+  max-width: 1280px;
+  margin: 0 auto;
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(180px, 24%) 1fr auto;
+  grid-template-areas: "meta wave controls";
+  align-items: center;
+  gap: 12px;
+}
+
+/* Left: tiny title */
+.meta {
+  grid-area: meta;
+  min-width: 0;
+}
+.meta .title {
+  font: 600 13px/1.2 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.92;
+}
+
+/* Middle: clean wave lane (no extra chrome) */
+.wave {
+  grid-area: wave;
+  height: 42px;
+  min-height: 36px;
+  border-radius: 10px;
+  overflow: hidden;
+  /* low-contrast rail to seat the waveform */
+  background: linear-gradient(180deg, #0f141a, #0e1217);
+  border: 1px solid #243042;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  padding-inline: 4px; /* keeps the rounded edge from touching samples */
+}
+
+/* Right: compact controls */
+.controls {
+  grid-area: controls;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.controls button {
+  appearance: none;
+  background: transparent;
+  color: inherit;
+  border: 1px solid #2a3646;
+  border-radius: 10px;
+  font: 500 12.5px/1 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+  padding: 8px 12px;
+  min-width: 72px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.04s ease;
+}
+.controls button:hover {
+  border-color: color-mix(in oklab, var(--accent, #2dd4bf) 45%, #2a3646);
+  background: rgba(255, 255, 255, 0.03);
+}
+.controls button:active {
+  transform: translateY(1px);
+}
+.controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Tablet: stack controls under wave, keep meta tight */
+@media (max-width: 1024px) {
+  :host {
+    --h: 104px;
+  }
+  .bar {
+    grid-template-columns: minmax(160px, 35%) 1fr;
+    grid-template-areas: "meta controls" "wave wave";
+    gap: 10px 12px;
+    align-content: center;
+  }
+  .wave {
+    height: 44px;
+  }
+}
+/* Phone: fully stacked, full-width controls */
+@media (max-width: 560px) {
+  :host {
+    --h: 120px;
+  }
+  .bar {
+    grid-template-columns: 1fr;
+    grid-template-areas: "meta" "wave" "controls";
+    gap: 8px;
+  }
+  .controls {
+    width: 100%;
+  }
+  .controls button {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .controls button {
+    transition: none !important;
+  }
+}
+/* --- height source of truth --- */
+:host {
+  --wave-h: 56px;
+} /* was 42px — align with WS default so it never clips */
+/* Middle: clean wave lane */
+.wave {
+  grid-area: wave;
+  height: var(--wave-h);
+  min-height: var(--wave-h);
+  line-height: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #0f141a, #0e1217);
+  border: 1px solid #243042;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  padding-inline: 4px;
+}
+
+/* Make sure all internal canvases stretch to the box */
+.wave canvas,
+.wave wave,
+.wave .wavesurfer,
+.wave .wavesurfer > canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+/*# sourceMappingURL=bottom-player.css.map */

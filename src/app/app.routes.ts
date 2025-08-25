@@ -1,20 +1,68 @@
-import { Routes } from '@angular/router';
-import {shareGuard} from './pages/send/share-guard';
-import {authGuard} from './core/auth-guard';
-import {verifiedGuard} from './core/veified-guard';
+import {Routes} from '@angular/router';
+import {VerifiedGuard} from '@core/guards/verified-guard';
+import {AppShell} from './shell/app-shell/app-shell';
+import {AuthGuard} from '@angular/fire/auth-guard';
 
 export const routes: Routes = [
-  { path: '', loadComponent: ()=> import('./pages/landing/landing').then(m=>m.Landing)},
-  { path: 'auth', loadComponent: () => import('./pages/auth/auth').then(m => m.Auth) },
-  { path: 'upload', loadComponent: () => import('./pages/upload/upload').then(m => m.Upload) },
+  // -------- public routes (no shell) --------
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () =>
+      import('@features/landing/landing').then(m => m.Landing),
+    title: 'AspireLoops'
+  },
+  {
+    path: 'auth',
+    loadComponent: () =>
+      import('@features/auth/auth').then(m => m.Auth),
+    title: 'Sign in'
+  },
+  {
+    path: 'verify',
+    loadComponent: () =>
+      import('@features/auth/verify/verify').then(m => m.Verify),
+    title: 'Verify your email'
+  },
 
-  { path: 'make', canActivate: [authGuard, verifiedGuard], loadComponent: () =>  import('./pages/make/dashboard/dashboard') .then(m => m.Dashboard)},
-  { path: 'pack/:id', canActivate: [authGuard, verifiedGuard], loadComponent: () => import('./pages/make/pack/pack').then(m => m.Pack)},
-  { path: 'pack/new', canActivate: [authGuard, verifiedGuard], loadComponent: () => import('./pages/make/pack/pack-new/pack-new').then(m => m.PackNew) },
-  { path: 's/:shareId', loadComponent: () => import('./pages/send/share-view/share-view').then(m => m.ShareView)},
-  { path: 'r/:reviewId', loadComponent: () => import('./pages/review/deliverables/deliverables').then(m => m.Deliverables)},
-  { path: 's/:shareId', canActivate: [shareGuard],
-    loadComponent: () => import('./pages/send/share-view/share-view').then(m => m.ShareView) },
+  // -------- app (protected) routes with persistent shell --------
+  {
+    path: 'app',
+    component: AppShell,
+    canActivate: [AuthGuard, VerifiedGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('@features/dashboard/dashboard').then(m => m.Dashboard),
+        title: 'Dashboard'
+      },
+      {
+        path: 'library', // user’s big file library
+        loadComponent: () =>
+          import('@features/library/library').then(m => m.Library),
+        title: 'Library'
+      },
+      {
+        path: 'pack/new',
+        loadComponent: () =>
+          import('@features/packs/pack-new/pack-new').then(m => m.PackNew),
+        title: 'New Pack'
+      },
+      {
+        path: 'packs/:id',
+        loadComponent: () => import('@features/packs/pack-detail/pack-detail').then(m => m.PackDetail),
+        title: 'Pack',
+      },
 
-  { path: '**', redirectTo: 'make' }
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' }
+    ]
+  },
+// src/app/app.routes.ts (add one)
+  {
+    path: 's/:id',
+    loadComponent: () => import('@features/share-page/share-page').then(m => m.SharePage),
+  },
+  // -------- fallback --------
+  { path: '**', redirectTo: '' }
 ];

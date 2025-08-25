@@ -1,0 +1,15 @@
+<div class="bar">
+  <div class="meta">
+    <div class="title">{{ (curr() || { title: 'Nothing playing' }).title }}</div>
+  </div>
+
+  <div #wave class="wave" aria-label="Waveform"></div>
+
+  <div class="controls">
+    <button (click)="prev()" title="Previous" [disabled]="!curr()">⟨</button>
+    <button (click)="toggle()" title="Play/Pause" [disabled]="!curr()">
+      {{ playing() ? 'Pause' : 'Play' }}
+    </button>
+    <button (click)="next()" title="Next" [disabled]="!curr()">⟩</button>
+  </div>
+</div>

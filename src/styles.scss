@@ -1,6 +1,125 @@
-/* You can add global styles to this file, and also import other style files */
-:root { --bg:#0f1216; --card:#151a20; --text:#e8ecf1; --muted:#9fb0c0; --accent:#2dd4bf; --accent-2:#ff7a7a; }
-html, body { height:100%; background:var(--bg); color:var(--text); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
-button { background:var(--card); color:var(--text); border:1px solid #263241; border-radius:12px; padding:.6rem 1rem; }
-header, footer { position: sticky; top:0; bottom:0; background:linear-gradient(180deg, rgba(15,18,22,.95), rgba(15,18,22,.6)); backdrop-filter: blur(8px); }
-*, *::before, *::after { box-sizing: border-box; }
+/* ────────────────────────────────────────────────────────────
+   Aspire Loops – Global Styles
+   - Design tokens
+   - Base reset / normalization
+   - Element defaults
+   - Small utilities (glass + sticky helpers)
+   ──────────────────────────────────────────────────────────── */
+
+/* 1) Design tokens (colors, spacing, layout vars) */
+:root {
+  /* palette */
+  --bg: #0f1216;
+  --surface: #151a20;   /* cards / panels */
+  --text: #e8ecf1;
+  --muted: #9fb0c0;
+  --accent: #2dd4bf;
+  --accent-2: #ff7a7a;
+  --focus: #5ac8fa;
+
+  /* borders / radii */
+  --border: #263241;
+  --radius: 12px;
+
+  /* layout (used by app shell / player) */
+  --nav-w: 180px;       /* override in app-shell if needed */
+  --player-h: 64px;     /* bottom player height */
+  --divider: 1px;
+
+  /* avoid mobile 100vh bugs; use min-height: var(--vh) */
+  --vh: 100dvh;
+}
+
+/* 2) Base reset / normalization */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  /* kill browser default 8px margin to avoid layout drift */
+  margin: 0;
+  padding: 0;
+
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* media elements behave predictably */
+img,
+svg,
+video,
+canvas,
+audio,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+/* form controls inherit typography/colors */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* links & focus */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* 3) Element defaults */
+button {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: .6rem 1rem;
+  cursor: pointer;
+  transition: border-color .15s ease, transform .05s ease;
+
+  &:hover {
+    /* subtle lift without custom colors */
+    border-color: color-mix(in srgb, var(--border), white 15%);
+  }
+  &:active {
+    transform: translateY(.5px);
+  }
+  &:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+  }
+}
+
+/* 4) Utilities */
+
+/* Frosted “glass” background — apply to sticky bars or panels */
+.glass {
+  background: linear-gradient(180deg, rgba(15,18,22,.95), rgba(15,18,22,.6));
+  backdrop-filter: blur(8px);
+}
+
+/* Sticky helpers (use on header/footer/divs as needed) */
+.sticky-top    { position: sticky; top: 0;    z-index: 100; }
+.sticky-bottom { position: sticky; bottom: 0; z-index: 100; }
+
+/* (Optional) If you still use <header>/<footer> tags directly */
+header.glass.sticky-top   {}
+footer.glass.sticky-bottom {}

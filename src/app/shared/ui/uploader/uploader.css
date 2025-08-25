@@ -1,0 +1,144 @@
+:host {
+  display: block;
+}
+
+/* Card-like dropzone */
+.drop {
+  position: relative;
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px dashed color-mix(in oklab, var(--muted) 26%, transparent);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--card) 92%, transparent), transparent), radial-gradient(1200px 400px at 10% -20%, rgba(255, 255, 255, 0.04), transparent 60%);
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.08s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  outline: none;
+}
+.drop input[type=file] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.drop .msg {
+  color: var(--muted);
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+.drop:hover, .drop.hover {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--muted));
+  background: linear-gradient(180deg, color-mix(in oklab, var(--card) 98%, transparent), transparent), radial-gradient(900px 300px at 15% -15%, rgba(45, 212, 191, 0.1), transparent 65%);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25) inset;
+}
+.drop:active {
+  transform: translateY(1px);
+}
+
+/* Jobs list */
+.jobs {
+  margin-top: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.job {
+  display: grid;
+  grid-template-columns: 1fr minmax(160px, 320px) 60px auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--card);
+  border: 1px solid #263241;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.job.finishing {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+.job .name {
+  min-width: 0;
+  color: var(--text);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.job .name small {
+  color: var(--muted);
+  font-weight: 500;
+}
+.job .bar {
+  height: 8px;
+  border-radius: 999px;
+  background: #1a2330;
+  overflow: hidden;
+}
+.job .bar .fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 90%, white), var(--accent));
+  transition: width 0.15s ease;
+}
+.job .pct {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: right;
+  min-width: 44px;
+}
+.job .ghost, .job button.ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid #2a3646;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 13px;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.05s ease;
+}
+.job .ghost:hover, .job button.ghost:hover {
+  border-color: color-mix(in oklab, var(--accent) 45%, #2a3646);
+  background: rgba(255, 255, 255, 0.02);
+}
+.job .ghost:active, .job button.ghost:active {
+  transform: translateY(1px);
+}
+.job .err {
+  grid-column: 1/-1;
+  color: #ff7a7a;
+  font-size: 12px;
+  padding-top: 2px;
+}
+
+.footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -2px;
+}
+.footer-actions .small {
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+/* Compact mode */
+@media (max-width: 720px) {
+  .job {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .job .pct {
+    order: 3;
+    text-align: left;
+  }
+  .job .ghost {
+    order: 4;
+    justify-self: start;
+  }
+}
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .drop, .job .bar .fill, .ghost, .job {
+    transition: none !important;
+  }
+}
+
+/*# sourceMappingURL=uploader.css.map */

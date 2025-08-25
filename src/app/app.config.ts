@@ -1,5 +1,5 @@
 import {ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection} from '@angular/core';
-import {provideRouter} from '@angular/router';
+import {provideRouter, withInMemoryScrolling, withViewTransitions} from '@angular/router';
 
 import {routes} from './app.routes';
 import {initializeApp, provideFirebaseApp} from '@angular/fire/app';
@@ -12,7 +12,12 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({eventCoalescing: true}),
-    provideRouter(routes), provideFirebaseApp(() => initializeApp({
+    provideRouter(
+      routes,
+      withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }),
+      withViewTransitions()
+    )
+    , provideFirebaseApp(() => initializeApp({
       projectId: "aspire-loops",
       appId: "1:735788137469:web:246bab7cefab603c7cf794",
       storageBucket: "aspire-loops.firebasestorage.app",
