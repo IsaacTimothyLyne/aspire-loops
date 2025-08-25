@@ -6,8 +6,10 @@ import * as os from 'node:os';
 import * as fs from 'node:fs';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
-import { rms, movingAvg, estimateTempo, tagRules } from '../utils/dsp';
+
+import { rms, movingAvg, estimateTempo, normalizeBpm, tagRules } from '../utils/dsp';
 import { tryDecodeWav } from '../utils/wav';
+import { estimateKeyHPS } from '../utils/key';
 
 const db = admin.firestore();
 const storage = admin.storage();
@@ -21,9 +23,8 @@ export const analyzeAudio = onObjectFinalized(
     const contentType = obj.contentType || '';
     const bucketName = obj.bucket;
 
-    logger.info('analyzeAudio:start', { bucketName, filePath, contentType });
-
     if (/\/preview\.mp3$/i.test(filePath)) return;
+
     const isAudioByMime = /^audio\//i.test(contentType);
     const isAudioByExt  = /\.(wav|wave|aif|aiff|flac|mp3|m4a|aac|ogg|oga)$/i.test(filePath);
     if (!isAudioByMime && !isAudioByExt) return;
@@ -52,6 +53,7 @@ export const analyzeAudio = onObjectFinalized(
     });
 
     const auto: any = { analyzedAt: Date.now() };
+
     try {
       const buf = fs.readFileSync(tmpWav);
       const dec = tryDecodeWav(buf);
@@ -59,26 +61,38 @@ export const analyzeAudio = onObjectFinalized(
         const { data, sampleRate } = dec;
         const dur = data.length / sampleRate;
 
+        // loudness / brightness / percussive
         const r = rms(data);
         auto.loudness = Number((20 * Math.log10(r + 1e-8)).toFixed(2));
 
-        let diffSum = 0;
-        for (let i = 1; i < data.length; i++) diffSum += Math.abs(data[i] - data[i-1]);
+        let diffSum = 0; for (let i = 1; i < data.length; i++) diffSum += Math.abs(data[i] - data[i-1]);
         auto.brightness = Number(Math.min(1, diffSum / data.length * 4).toFixed(3));
 
-        const env = movingAvg(data, Math.round(sampleRate * 0.01));
+        const env = movingAvg(data, Math.round(sampleRate*0.01));
         let pos = 0; for (let i = 1; i < env.length; i++) if (env[i] > env[i-1]) pos++;
         auto.percussive = Number((pos / env.length).toFixed(3));
 
+        // tempo (+ normalized & alternates)
         const t = estimateTempo(data, sampleRate);
         auto.bpm = t.bpm ?? null;
         auto.bpmConfidence = t.conf;
+        auto.bpmNorm = t.bpm ? normalizeBpm(t.bpm) : null;
+        auto.altBpms = t.alt || [];
 
-        auto.key = null; auto.keyConfidence = 0;
+        // key (HPS + Krumhansl)
+        const k = estimateKeyHPS(data.subarray(0, Math.min(data.length, sampleRate * 12)), sampleRate);
+        auto.key = k.key;
+        auto.keyConfidence = k.conf;
 
-        const ruled = tagRules(dur, auto.percussive, auto.brightness, auto.bpm ?? null);
-        auto.typeGuess = ruled.typeGuess ?? null;
-        auto.tags = ruled.tags;
+        // richer tags & type guess
+        const bpmForTags = auto.bpmNorm ?? auto.bpm ?? null;
+        auto.tags = tagRules(dur, auto.percussive, auto.brightness, bpmForTags, auto.key);
+
+        // type guess: keep your old rule, but prefer "loop"/"demo" based on duration
+        auto.typeGuess =
+          dur <= 65 ? (auto.percussive >= 0.65 ? 'drum-loop' : 'melody-loop') :
+            dur >= 120 ? 'demo' :
+              null;
       }
     } catch (e) {
       logger.warn('analyze: feature error', String(e));
@@ -88,14 +102,30 @@ export const analyzeAudio = onObjectFinalized(
     }
 
     const fileRef = db.doc(`users/${uid}/files/${fileId}`);
+
     await db.runTransaction(async (tx) => {
       const snap = await tx.get(fileRef);
       const cur  = (snap.exists ? snap.data() : {}) || {};
       const patch: any = { auto, updatedAt: Date.now() };
 
-      if (auto.bpm && (cur.bpm == null) && (auto.bpmConfidence ?? 0) >= 0.3) patch.bpm = auto.bpm;
-      if (auto.key && (cur.key == null) && (auto.keyConfidence ?? 0) >= 0.3) patch.key = auto.key;
-      if (auto.typeGuess && !cur.type) patch.type = auto.typeGuess;
+      // BPM: promote normalized first
+      const pickBpm = auto.bpmNorm ?? auto.bpm;
+      if (pickBpm && (cur.bpm == null)) patch.bpm = pickBpm;
+
+      // KEY: promote if confident
+      if (auto.key && (cur.key == null) && (auto.keyConfidence ?? 0) >= 0.25) {
+        patch.key = auto.key;
+      }
+
+      // TYPE: override placeholder "audio"
+      if (auto.typeGuess && (!cur.type || cur.type === 'audio')) {
+        patch.type = auto.typeGuess;
+      } else if (auto.typeGuess) {
+        // stash suggestion if user already set a real type
+        patch.typeAuto = auto.typeGuess;
+      }
+
+      // TAGS: merge up to 20
       if (Array.isArray(auto.tags) && auto.tags.length) {
         const curTags = Array.isArray(cur.tags) ? cur.tags : [];
         patch.tags = Array.from(new Set([...curTags, ...auto.tags])).slice(0, 20);

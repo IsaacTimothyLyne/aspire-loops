@@ -598,4 +598,107 @@
   padding: 24px 16px;
 }
 
+/* grid: add selection column at the start */
+.row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1.8fr) 60px 60px minmax(0, 1fr) 80px 110px 56px; /* actions */
+  /* ...rest stays */
+}
+
+.row.head .c.sel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.c.sel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.c.sel input[type=checkbox] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* selected highlight */
+.row.selected:not(.head) {
+  background: linear-gradient(180deg, rgba(96, 165, 250, 0.12), transparent 55%);
+  border-color: color-mix(in oklab, var(--accent) 35%, #263241);
+}
+
+/* Bulk selection bar */
+.bulkbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  background: linear-gradient(180deg, rgba(18, 22, 27, 0.98), rgba(18, 22, 27, 0.96));
+  border: 1px solid #2a3646;
+  border-radius: 10px;
+}
+.bulkbar .muted {
+  color: var(--muted);
+}
+.bulkbar .ghost {
+  border: 1px solid #2a3646;
+  background: transparent;
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 8px;
+}
+.bulkbar .danger {
+  color: #ff7a7a;
+  border-color: #3a1f23;
+}
+
+/* skeleton tweak to include sel cell */
+.skeleton .c.sel.sk {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: #0f141a;
+}
+
+/* grid: remove first select column, give name more space */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 2.4fr) 60px 60px minmax(0, 1fr) 80px 110px 56px; /* actions */
+  /* … your existing styles … */
+}
+
+/* selection highlight */
+.row.selected:not(.head) {
+  background: linear-gradient(180deg, rgba(96, 165, 250, 0.12), transparent 55%);
+  border-color: color-mix(in oklab, var(--accent) 35%, #263241);
+}
+
+/* bulk bar */
+.bulkbar {
+  position: sticky;
+  top: 8px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  background: rgba(15, 20, 26, 0.85);
+  backdrop-filter: blur(6px);
+  border: 1px solid #2a3646;
+  border-radius: 10px;
+}
+.bulkbar strong {
+  font-weight: 700;
+}
+.bulkbar .gap {
+  flex: 1;
+}
+
 /*# sourceMappingURL=library.css.map */

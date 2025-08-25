@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "fft-js": "^0.0.12",
+    "node-wav": "^0.0.2"
+  }
+}

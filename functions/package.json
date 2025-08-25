@@ -16,6 +16,7 @@
   "dependencies": {
     "archiver": "^7.0.1",
     "ffmpeg-static": "^5.2.0",
+    "fft-js": "^0.0.12",
     "firebase-admin": "^13.4.0",
     "firebase-functions": "^6.4.0",
     "fluent-ffmpeg": "^2.1.3",

@@ -126,6 +126,14 @@
       </div>
     </div>
   </div>
+  <!-- Bulk selection bar -->
+  <div class="bulkbar" *ngIf="selCount() > 0">
+    <strong>{{ selCount() }}</strong> selected
+    <div class="gap"></div>
+    <button class="ghost" (click)="openBulkEdit()">Edit</button>
+    <button class="ghost danger" (click)="bulkDelete()">Delete</button>
+    <button class="ghost" (click)="clearSelection()">Clear</button>
+  </div>
 
   <!-- Results count -->
   <div class="result-count" *ngIf="hasFiles()">
@@ -137,6 +145,7 @@
     <div class="list">
       @for (i of [0,1,2,3]; track i) {
         <div class="row skeleton">
+
           <div class="c name">
             <div class="title sk"></div>
             <div class="sub sk"></div>
@@ -169,20 +178,22 @@
           <div class="c actions"></div>
         </div>
 
-        @for (f of visible(); track f.id) {
+        @for (f of visible(); track f.id; let i = $index) {
           <div
             class="row"
             [class.playing]="isCurrent(f)"
+            [class.selected]="isSelected(f.id)"
             (contextmenu)="openMenu($event, f)"
+            (click)="onRowClick($event, f, i)"
             (dblclick)="playIfReady(f)"
             tabindex="0"
             (keydown)="onRowKey($event, f)"
             aria-label="Track row"
           >
             <div class="c name">
-              <div class="title" (click)="playIfReady(f)">
+              <div class="title">
                 <span class="dot playing" *ngIf="isCurrent(f)">●</span>
-                {{ displayName(f) }}
+                {{ prettyName(f) }}
               </div>
               <div class="sub">
                 {{ f.ext || (f.mime || 'audio') }} • {{ formatBytes(f.size) }}
@@ -200,33 +211,20 @@
                 }
                 @if (hiddenTagCount(f, 2) > 0) {
                   <span class="tag more" [title]="(f.tags || []).join(', ')">
-                    +{{ hiddenTagCount(f, 2) }}
-                  </span>
+            +{{ hiddenTagCount(f, 2) }}
+          </span>
                 }
               } @else { <span class="muted">—</span> }
             </div>
 
-            <div class="c meta">
-              <span class="chip">{{ f.type || 'audio' }}</span>
-            </div>
-
+            <div class="c meta"><span class="chip">{{ f.type || 'audio' }}</span></div>
             <div class="c created">{{ f.createdAt | date:'mediumDate' }}</div>
 
             <div class="c actions">
-              <button
-                class="icon-btn"
-                [attr.aria-label]="isCurrent(f) ? 'Pause' : 'Play'"
-                [attr.aria-pressed]="isCurrent(f)"
-                (click)="toggle(f)"
-              >
-                <svg *ngIf="!isCurrent(f)" viewBox="0 0 24 24" class="icon" aria-hidden="true">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-                <svg *ngIf="isCurrent(f)" viewBox="0 0 24 24" class="icon" aria-hidden="true">
-                  <path d="M6 5h4v14H6zM14 5h4v14h-4z"/>
-                </svg>
+              <button class="icon-btn" (click)="toggle(f); $event.stopPropagation()">
+                <svg *ngIf="!isCurrent(f)" viewBox="0 0 24 24" class="icon"><path d="M8 5v14l11-7z"/></svg>
+                <svg *ngIf="isCurrent(f)" viewBox="0 0 24 24" class="icon"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
               </button>
-
               <button class="icon kebab" (click)="openMenu($event, f)" aria-label="More">•••</button>
             </div>
           </div>
@@ -321,3 +319,31 @@
     </div>
   </div>
 </div>
+@if (bulkEdit()) {
+  <div class="sheet-backdrop" *ngIf="bulkEdit()" (click)="bulkEdit.set(null)"></div>
+  <div class="sheet" *ngIf="bulkEdit()">
+    <h3>Bulk edit ({{ selCount() }} files)</h3>
+
+    <label><span>BPM</span><input type="number" [(ngModel)]="bulkEdit()!.bpm" placeholder="(leave blank = keep)"></label>
+    <label><span>Key</span><input [(ngModel)]="bulkEdit()!.key" placeholder="e.g., Am (leave blank = keep)"></label>
+
+    <label>
+      <span>Type</span>
+      <input [(ngModel)]="bulkEdit()!.type" list="type-options" placeholder="audio / loop / …">
+    </label>
+
+    <label>
+      <span>Tags</span>
+      <input [(ngModel)]="bulkEdit()!.tags" placeholder="tag1, tag2 (leave blank = no change)">
+    </label>
+    <label class="row" style="align-items:center;gap:8px;">
+      <input type="checkbox" [(ngModel)]="bulkEdit()!.mergeTags">
+      <span>Merge tags (off = replace)</span>
+    </label>
+
+    <div class="actions">
+      <button class="ghost" (click)="bulkEdit.set(null)">Cancel</button>
+      <button class="primary" (click)="applyBulkEdit()">Apply</button>
+    </div>
+  </div>
+}
